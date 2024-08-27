@@ -27,7 +27,7 @@ func NewServer() *Server {
 		router: chi.NewRouter(),
 	}
 
-	srv.RegisterRoutes()
+	srv.registerRoutes()
 	srv.httpServer = &http.Server{
 		Addr:         fmt.Sprintf(":%s", addr),
 		Handler:      srv.router,
