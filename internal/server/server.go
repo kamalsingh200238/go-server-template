@@ -8,10 +8,13 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type Server struct {
 	httpServer *http.Server
+	router     *chi.Mux
 }
 
 func NewServer() *Server {
@@ -20,17 +23,20 @@ func NewServer() *Server {
 	writeTimeout := getEnvAsDuration("WRITE_TIMEOUT", 10*time.Second)
 	idleTimeout := getEnvAsDuration("IDLE_TIMEOUT", 15*time.Second)
 
-	r := registerRoutes()
-
-	return &Server{
-		httpServer: &http.Server{
-			Addr:         fmt.Sprintf(":%s", addr),
-			Handler:      r,
-			ReadTimeout:  readTimeout,
-			WriteTimeout: writeTimeout,
-			IdleTimeout:  idleTimeout,
-		},
+	srv := &Server{
+		router: chi.NewRouter(),
 	}
+
+	srv.RegisterRoutes()
+	srv.httpServer = &http.Server{
+		Addr:         fmt.Sprintf(":%s", addr),
+		Handler:      srv.router,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
+		IdleTimeout:  idleTimeout,
+	}
+
+	return srv
 }
 
 func (s *Server) Start() error {
