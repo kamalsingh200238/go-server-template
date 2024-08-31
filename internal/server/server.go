@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
-	"log/slog"
+	"go-project-setup/internal/logger"
 	"net/http"
 	"os"
 	"strconv"
@@ -40,12 +40,12 @@ func NewServer() *Server {
 }
 
 func (s *Server) Start() error {
-	slog.Info("starting HTTP server", "address", s.httpServer.Addr)
+	logger.Log.Info("starting HTTP server", "address", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	slog.Info("shutting down HTTP server")
+	logger.Log.Info("shutting down HTTP server")
 	return s.httpServer.Shutdown(ctx)
 }
 
@@ -65,7 +65,7 @@ func getEnvAsDuration(key string, defaultValue time.Duration) time.Duration {
 	}
 	value, err := strconv.Atoi(valueStr)
 	if err != nil {
-		slog.Error("Invalid duration value", "key", key, "value", valueStr, "error", err)
+		logger.Log.Error("invalid duration value", "key", key, "value", valueStr, "error", err)
 		return defaultValue
 	}
 	return time.Duration(value) * time.Second
